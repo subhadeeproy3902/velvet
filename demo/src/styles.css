@@ -236,17 +236,16 @@ body { display: flex; flex-direction: column; }
  * `color` here is irrelevant visually (children render transparent) but
  * stays themeable in case the variant ever changes. */
 .hero-word {
-  display:  hidden;
+  display: inline-flex;
 }
 .hero-word-text {
   font-family: 'Prata', sans-serif;
   font-weight: 700;
-  font-size: 3rem;
-  text-decoration: uppercase;
-  letter-spacing: -0.04em;
-  color: transparent;
+  font-size: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25rem;
+  color: var(--text);
   padding: 8px 14px;
-  display: hidden;
 }
 
 /* ─── Card example ──────────────────────────────────────────── */

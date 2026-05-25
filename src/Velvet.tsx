@@ -467,6 +467,30 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       )
       io.observe(root)
 
+      // Stylesheet mutation observer — regenerates the text/border mask
+      // when CSS rules affecting the children change (Vite HMR style
+      // swaps, devtools edits, dynamically-added stylesheets). Without
+      // this the canvas2D mask is frozen at first paint and CSS edits
+      // like `text-transform: uppercase` only show up on a hard refresh.
+      let maskRaf: number | null = null
+      const queueMaskUpdate = () => {
+        if (maskRaf != null) return
+        maskRaf = requestAnimationFrame(() => {
+          maskRaf = null
+          if (variantRef.current === 'text') updateTextMask()
+          else if (variantRef.current === 'border') updateBorderMask()
+        })
+      }
+      const headObserver = new MutationObserver(queueMaskUpdate)
+      headObserver.observe(document.head, { childList: true, subtree: true })
+      // Also watch the document element so theme toggle (data-theme
+      // attribute) re-runs the mask with the new computed font color.
+      const docObserver = new MutationObserver(queueMaskUpdate)
+      docObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme', 'class'],
+      })
+
       if (variantRef.current === 'border') {
         // Run once after mount in case ResizeObserver hasn't fired yet.
         updateBorderMask()
@@ -479,8 +503,11 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       return () => {
         if (rafRef.current) cancelAnimationFrame(rafRef.current)
         if (resizeRaf != null) cancelAnimationFrame(resizeRaf)
+        if (maskRaf != null) cancelAnimationFrame(maskRaf)
         ro.disconnect()
         io.disconnect()
+        headObserver.disconnect()
+        docObserver.disconnect()
         mql.removeEventListener('change', handleMql)
         glRef.current?.destroy()
         glRef.current = null

@@ -9,8 +9,8 @@ export type Palette = { color: string; sheen: string };
  */
 export const PALETTES: Record<string, Record<Theme, Palette>> = {
   hero: {
-    dark: { color: "#ff0022", sheen: "#ffffff" },
-    light: { color: "#ff0022", sheen: "#ffffff" },
+    dark: { color: "#ffffff", sheen: "#000000" },
+    light: { color: "#5f5f5f", sheen: "#ffffff" },
   },
   card: {
     dark: { color: "#8B0000", sheen: "#ffb8b8" },
