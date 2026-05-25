@@ -10,7 +10,7 @@ import {
 import type { CSSProperties } from 'react'
 import type { VelvetDriver, VelvetProps, VelvetVariant } from './types'
 import { injectStyles } from './styles'
-import { VelvetGL } from './gl'
+import { getRenderer, type VelvetTarget } from './renderer'
 
 const clamp = (v: number, lo: number, hi: number) =>
   v < lo ? lo : v > hi ? hi : v
@@ -87,8 +87,7 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
     const rootRef = useRef<HTMLDivElement | null>(null)
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const childrenRef = useRef<HTMLDivElement | null>(null)
-    const glRef = useRef<VelvetGL | null>(null)
-    const rafRef = useRef<number>(0)
+    const targetRef = useRef<VelvetTarget | null>(null)
     const currentX = useRef(0.5)
     const currentY = useRef(0.5)
     const targetX = useRef(0.5)
@@ -325,51 +324,28 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       children,
     ])
 
-    const tick = useCallback(() => {
-      const root = rootRef.current
-      const canvas = canvasRef.current
-      const gl = glRef.current
-      if (!root || !canvas || !gl) {
-        rafRef.current = requestAnimationFrame(tick)
-        return
-      }
-
-      if (pausedRef.current || !isVisible.current) {
-        rafRef.current = requestAnimationFrame(tick)
-        return
-      }
+    // Per-instance per-frame update, called BY the shared renderer's
+    // RAF loop (no per-Velvet RAF — one global loop for the whole page).
+    // Advances time / lerp / driver-derived light position and writes
+    // them into target.opts; the renderer reads those and renders.
+    const targetUpdate = useCallback((dtMs: number) => {
+      const target = targetRef.current
+      if (!target) return
+      if (pausedRef.current) return
 
       const e = reduceMotion.current ? 1 : easeRef.current
       currentX.current += (targetX.current - currentX.current) * e
       currentY.current += (targetY.current - currentY.current) * e
 
-      const dpr =
-        typeof window !== 'undefined' ? Math.min(window.devicePixelRatio || 1, 2) : 1
-      const cssW = root.offsetWidth
-      const cssH = root.offsetHeight
-      const w = Math.max(1, Math.round(cssW * dpr))
-      const h = Math.max(1, Math.round(cssH * dpr))
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w
-        canvas.height = h
-      }
-
-      // Speed-scaled monotonic clock. dt is clamped so a tab returning
-      // from background doesn't dump a huge delta. Wrap at ~28h to keep
-      // FP precision sane for the high-frequency noise samples.
-      const now = Date.now()
-      const dtMs = Math.min(now - lastFrame.current, 100)
-      lastFrame.current = now
-      shaderTime.current = (shaderTime.current + (dtMs / 1000) * speedRef.current) % 100000
-      const t = shaderTime.current
+      // Speed-scaled monotonic clock, wrapped at 1000s so mediump
+      // float (mobile) keeps full precision indexing the noise field.
+      shaderTime.current =
+        (shaderTime.current + (dtMs / 1000) * speedRef.current) % 1000
 
       const drv = driverRef.current
       let lx: number
       let ly: number
       if (drv === 'auto') {
-        // Auto = no cursor bias; the shader's linear time drift carries
-        // the entire animation. Anchoring at center keeps the texture
-        // breathing in place rather than panning.
         lx = 0.5
         ly = 0.5
       } else if (drv === 'static') {
@@ -381,20 +357,17 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         ly = currentY.current
       }
 
-      gl.render({
-        lightX: lx,
-        lightY: ly,
-        time: t,
-        color: colorRgbRef.current,
-        sheen: sheenRgbRef.current,
-        intensity: intensityRef.current,
-        grain: grainRef.current,
-        depth: depthRef.current,
-        roughness: roughnessRef.current,
-      })
+      target.opts.lightX = lx
+      target.opts.lightY = ly
+      target.opts.time = shaderTime.current
+      target.opts.color = colorRgbRef.current
+      target.opts.sheen = sheenRgbRef.current
+      target.opts.intensity = intensityRef.current
+      target.opts.grain = grainRef.current
+      target.opts.depth = depthRef.current
+      target.opts.roughness = roughnessRef.current
 
       onSheenChangeRef.current?.(lx, ly, intensityRef.current)
-      rafRef.current = requestAnimationFrame(tick)
     }, [])
 
     useEffect(() => {
@@ -409,37 +382,21 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       colorRgbRef.current = cssColorToRgb(colorRef.current)
       sheenRgbRef.current = cssColorToRgb(sheenColorRef.current)
 
-      // Lazy GL init — defer compiling the shader / allocating the WebGL
-      // context until the element first enters the viewport. On a page
-      // with many Velvets this stops the browser hitting its per-page
-      // context cap (~8 on mobile Safari) at mount, which is what was
-      // making the top instances go transparent while bottom ones worked.
-      // Once initialised, the context is kept alive — never destroyed on
-      // scroll. The existing webglcontextrestored handler in gl.ts will
-      // revive any context the browser does evict.
-      let glInitAttempted = false
-      const tryInitGL = () => {
-        if (glInitAttempted || glRef.current) return
-        glInitAttempted = true
-        try {
-          const gl = new VelvetGL(canvas)
-          gl.init()
-          glRef.current = gl
-          if (typeof window !== 'undefined') {
-            ;(window as unknown as { __VELVET_FX__?: string }).__VELVET_FX__ = '1.0.0'
-          }
-          // Mask drawing depends on the canvas being its final size,
-          // which it now is. Re-run for variants that need it.
-          if (variantRef.current === 'border') updateBorderMask()
-          else if (variantRef.current === 'text') updateTextMask()
-        } catch (err) {
-          // Visible fallback: paint the velvet base color into the canvas
-          // via 2D context so the wrapper still reads as fabric instead
-          // of collapsing to a transparent rectangle (which shows the
-          // page bg through — and in light mode that's white).
-          if (typeof console !== 'undefined') {
-            console.warn('[velvet-fx] WebGL init failed, falling back to 2D paint:', err)
-          }
+      // Register with the SHARED renderer — one WebGL context for the
+      // whole page. Each <Velvet>'s canvas is a regular 2D canvas that
+      // receives the shader output via drawImage. 2D contexts are
+      // uncapped, so the browser's per-page WebGL cap is never tripped
+      // no matter how many Velvets are on the page, and the context
+      // can't be lost by rapid scrolling because there's only one.
+      const renderer = getRenderer()
+      let registered = false
+      const tryRegister = () => {
+        if (registered || targetRef.current) return
+        registered = true
+        if (!renderer) {
+          // No WebGL at all: solid-color 2D fallback so the wrapper
+          // doesn't read as transparent (which is page-bg-white in
+          // light mode).
           try {
             const ctx2d = canvas.getContext('2d')
             if (ctx2d) {
@@ -449,7 +406,21 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
               ctx2d.fillRect(0, 0, canvas.width, canvas.height)
             }
           } catch {}
+          return
         }
+        const target = renderer.register(canvas)
+        if (!target) {
+          registered = false
+          return
+        }
+        target.update = targetUpdate
+        targetRef.current = target
+        if (typeof window !== 'undefined') {
+          ;(window as unknown as { __VELVET_FX__?: string }).__VELVET_FX__ = '1.0.0'
+        }
+        // Mask drawing depends on the canvas being at its final size.
+        if (variantRef.current === 'border') updateBorderMask()
+        else if (variantRef.current === 'text') updateTextMask()
       }
 
       const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -474,9 +445,14 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         (entries) => {
           for (const entry of entries) {
             isVisible.current = entry.isIntersecting
-            // First scroll-into-view triggers GL init. After that the
-            // context lives forever — visibility only pauses rendering.
-            if (entry.isIntersecting) tryInitGL()
+            // First scroll-into-view registers with the shared renderer
+            // (idempotent). Subsequent transitions toggle target.visible
+            // so the renderer can skip off-screen targets cheaply
+            // without ever losing them.
+            if (entry.isIntersecting) tryRegister()
+            if (renderer && targetRef.current) {
+              renderer.setVisible(targetRef.current, entry.isIntersecting)
+            }
           }
         },
         { threshold: 0, rootMargin: '300px' },
@@ -494,7 +470,7 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         rect.right > -300
       if (initiallyVisible) {
         isVisible.current = true
-        tryInitGL()
+        tryRegister()
       }
 
       // Stylesheet mutation observer — regenerates the text/border mask
@@ -528,10 +504,10 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         updateTextMask()
       }
 
-      rafRef.current = requestAnimationFrame(tick)
+      // No per-instance RAF — the shared renderer owns the loop and
+      // calls target.update on each registered target every frame.
 
       return () => {
-        if (rafRef.current) cancelAnimationFrame(rafRef.current)
         if (resizeRaf != null) cancelAnimationFrame(resizeRaf)
         if (maskRaf != null) cancelAnimationFrame(maskRaf)
         ro.disconnect()
@@ -539,10 +515,12 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         headObserver.disconnect()
         docObserver.disconnect()
         mql.removeEventListener('change', handleMql)
-        glRef.current?.destroy()
-        glRef.current = null
+        if (renderer && targetRef.current) {
+          renderer.unregister(targetRef.current)
+        }
+        targetRef.current = null
       }
-    }, [mounted, tick, updateBorderMask, updateTextMask])
+    }, [mounted, targetUpdate, updateBorderMask, updateTextMask])
 
     // Cursor driver (mouse / touch)
     useEffect(() => {
