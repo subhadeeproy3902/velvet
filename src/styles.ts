@@ -2,11 +2,19 @@ const STYLE_TAG_ATTR = 'data-velvet-fx'
 
 export function injectStyles(): void {
   if (typeof document === 'undefined') return
-  if (document.querySelector(`[${STYLE_TAG_ATTR}]`)) return
-
+  const css = buildCSS()
+  const existing = document.querySelector<HTMLStyleElement>(
+    `style[${STYLE_TAG_ATTR}]`,
+  )
+  if (existing) {
+    // Update in place when the CSS body has actually changed — keeps
+    // Vite HMR working without leaving stale rules around after a save.
+    if (existing.textContent !== css) existing.textContent = css
+    return
+  }
   const style = document.createElement('style')
   style.setAttribute(STYLE_TAG_ATTR, '')
-  style.textContent = buildCSS()
+  style.textContent = css
   document.head.appendChild(style)
 }
 
