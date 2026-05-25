@@ -67,10 +67,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/subhadeeproy3902/velvet-fx.git"
+    "url": "git+https://github.com/subhadeeproy3902/velvet.git"
   },
   "bugs": {
-    "url": "https://github.com/subhadeeproy3902/velvet-fx/issues"
+    "url": "https://github.com/subhadeeproy3902/velvet/issues"
   },
   "author": {
     "name": "Subhadeep Roy",

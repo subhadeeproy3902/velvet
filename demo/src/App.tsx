@@ -34,7 +34,7 @@ export function App() {
             <ThemeToggle />
             <a
               className="icon-btn"
-              href="https://github.com/subhadeeproy3902/velvet-fx"
+              href="https://github.com/subhadeeproy3902/velvet"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"

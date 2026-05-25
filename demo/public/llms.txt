@@ -67,7 +67,7 @@ import { Velvet } from 'velvet-fx'
 ## Links
 
 - Demo: https://velvet.mvp-subha.me
-- GitHub: https://github.com/subhadeeproy3902/velvet-fx
+- GitHub: https://github.com/subhadeeproy3902/velvet
 - npm: https://www.npmjs.com/package/velvet-fx
 - Author: https://x.com/mvp_Subha
 

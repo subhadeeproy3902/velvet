@@ -50,10 +50,10 @@
   </g>
 
   <!-- Title -->
-  <text x="192" y="172"
+  <text x="192" y="188"
         font-family="'Prata', Georgia, serif"
         font-size="76" font-weight="400"
-        fill="#fbfbfb" letter-spacing="-3">velvet-fx</text>
+        fill="#fbfbfb" letter-spacing="-3">velvet</text>
 
   <!-- Tagline -->
   <text x="96" y="312"

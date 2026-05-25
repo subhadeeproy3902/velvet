@@ -7,7 +7,7 @@
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://velvet.mvp-subha.me/og.svg</image:loc>
+      <image:loc>https://velvet.mvp-subha.me/og.png</image:loc>
       <image:title>velvet-fx — WebGL velvet fabric shader for React</image:title>
       <image:caption>One shader, four variants, five drivers, zero runtime dependencies.</image:caption>
     </image:image>
