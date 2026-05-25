@@ -409,34 +409,47 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       colorRgbRef.current = cssColorToRgb(colorRef.current)
       sheenRgbRef.current = cssColorToRgb(sheenColorRef.current)
 
-      let gl: VelvetGL
-      try {
-        gl = new VelvetGL(canvas)
-        gl.init()
-      } catch (err) {
-        // Visible fallback: paint the velvet base color into the canvas
-        // via 2D context so the wrapper still reads as fabric instead of
-        // collapsing to a transparent rectangle (which shows the page bg
-        // through — and in light mode that's white).
-        if (typeof console !== 'undefined') {
-          console.warn('[velvet-fx] WebGL init failed, falling back to 2D paint:', err)
-        }
+      // Lazy GL init — defer compiling the shader / allocating the WebGL
+      // context until the element first enters the viewport. On a page
+      // with many Velvets this stops the browser hitting its per-page
+      // context cap (~8 on mobile Safari) at mount, which is what was
+      // making the top instances go transparent while bottom ones worked.
+      // Once initialised, the context is kept alive — never destroyed on
+      // scroll. The existing webglcontextrestored handler in gl.ts will
+      // revive any context the browser does evict.
+      let glInitAttempted = false
+      const tryInitGL = () => {
+        if (glInitAttempted || glRef.current) return
+        glInitAttempted = true
         try {
-          const ctx2d = canvas.getContext('2d')
-          if (ctx2d) {
-            canvas.width = Math.max(1, root.offsetWidth)
-            canvas.height = Math.max(1, root.offsetHeight)
-            ctx2d.fillStyle = colorRef.current
-            ctx2d.fillRect(0, 0, canvas.width, canvas.height)
+          const gl = new VelvetGL(canvas)
+          gl.init()
+          glRef.current = gl
+          if (typeof window !== 'undefined') {
+            ;(window as unknown as { __VELVET_FX__?: string }).__VELVET_FX__ = '1.0.0'
           }
-        } catch {}
-        return
-      }
-      glRef.current = gl
-      // Tiny version marker so the user can verify in DevTools that the
-      // bundle they're looking at is the latest one.
-      if (typeof window !== 'undefined') {
-        ;(window as unknown as { __VELVET_FX__?: string }).__VELVET_FX__ = '1.0.0'
+          // Mask drawing depends on the canvas being its final size,
+          // which it now is. Re-run for variants that need it.
+          if (variantRef.current === 'border') updateBorderMask()
+          else if (variantRef.current === 'text') updateTextMask()
+        } catch (err) {
+          // Visible fallback: paint the velvet base color into the canvas
+          // via 2D context so the wrapper still reads as fabric instead
+          // of collapsing to a transparent rectangle (which shows the
+          // page bg through — and in light mode that's white).
+          if (typeof console !== 'undefined') {
+            console.warn('[velvet-fx] WebGL init failed, falling back to 2D paint:', err)
+          }
+          try {
+            const ctx2d = canvas.getContext('2d')
+            if (ctx2d) {
+              canvas.width = Math.max(1, root.offsetWidth)
+              canvas.height = Math.max(1, root.offsetHeight)
+              ctx2d.fillStyle = colorRef.current
+              ctx2d.fillRect(0, 0, canvas.width, canvas.height)
+            }
+          } catch {}
+        }
       }
 
       const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -461,11 +474,28 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         (entries) => {
           for (const entry of entries) {
             isVisible.current = entry.isIntersecting
+            // First scroll-into-view triggers GL init. After that the
+            // context lives forever — visibility only pauses rendering.
+            if (entry.isIntersecting) tryInitGL()
           }
         },
-        { threshold: 0 },
+        { threshold: 0, rootMargin: '300px' },
       )
       io.observe(root)
+
+      // Synchronous check for elements that are already inside the
+      // viewport at mount — avoids the one-frame gap before the
+      // IntersectionObserver fires its first callback.
+      const rect = root.getBoundingClientRect()
+      const initiallyVisible =
+        rect.top < (window.innerHeight || 0) + 300 &&
+        rect.bottom > -300 &&
+        rect.left < (window.innerWidth || 0) + 300 &&
+        rect.right > -300
+      if (initiallyVisible) {
+        isVisible.current = true
+        tryInitGL()
+      }
 
       // Stylesheet mutation observer — regenerates the text/border mask
       // when CSS rules affecting the children change (Vite HMR style
