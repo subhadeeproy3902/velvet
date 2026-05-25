@@ -1,6 +1,6 @@
 {
   "name": "velvet-fx",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Animated velvet fabric shader effect for React",
   "type": "module",
   "main": "dist/index.cjs.js",
@@ -18,7 +18,9 @@
       }
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
     "dev": "vite --config demo/vite.config.ts",
