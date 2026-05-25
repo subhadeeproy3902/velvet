@@ -1,0 +1,90 @@
+{
+  "name": "velvet-fx",
+  "version": "1.0.0",
+  "description": "Animated velvet fabric shader effect for React",
+  "type": "module",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "require": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.cjs.js"
+      }
+    }
+  },
+  "files": ["dist"],
+  "sideEffects": false,
+  "scripts": {
+    "dev": "vite --config demo/vite.config.ts",
+    "build": "vite build",
+    "build:demo": "vite build --config demo/vite.config.ts",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --config demo/vite.config.ts",
+    "prepublishOnly": "bun run build"
+  },
+  "packageManager": "bun@1.1.0",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^5.3.0",
+    "vite": "^5.0.0",
+    "vite-plugin-dts": "^3.7.0"
+  },
+  "keywords": [
+    "react",
+    "react-component",
+    "velvet",
+    "fabric",
+    "webgl",
+    "glsl",
+    "shader",
+    "brdf",
+    "animation",
+    "effect",
+    "cursor",
+    "scroll",
+    "gyroscope",
+    "auto",
+    "playground",
+    "interactive",
+    "motion",
+    "ui",
+    "typescript"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/subhadeeproy3902/velvet-fx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/subhadeeproy3902/velvet-fx/issues"
+  },
+  "author": {
+    "name": "Subhadeep Roy",
+    "url": "https://x.com/mvp_Subha"
+  },
+  "contributors": [
+    {
+      "name": "Subhadeep Roy",
+      "url": "https://x.com/mvp_Subha"
+    },
+    {
+      "name": "Claude",
+      "url": "https://claude.com"
+    }
+  ],
+  "homepage": "https://velvet.mvp-subha.me"
+}

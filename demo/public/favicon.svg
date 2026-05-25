@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <radialGradient id="vlvBase" cx="0.35" cy="0.35" r="0.85">
+      <stop offset="0" stop-color="#ffb4b4" stop-opacity="0.85"/>
+      <stop offset="0.45" stop-color="#8b0000"/>
+      <stop offset="1" stop-color="#1a0202"/>
+    </radialGradient>
+    <radialGradient id="vlvSheen" cx="0.28" cy="0.28" r="0.35">
+      <stop offset="0" stop-color="#fff5f5" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#fff5f5" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="vlvBlur" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="0.4"/>
+    </filter>
+  </defs>
+  <circle cx="32" cy="32" r="30" fill="url(#vlvBase)"/>
+  <g filter="url(#vlvBlur)" opacity="0.55">
+    <!-- Fiber strokes — short angled lines suggesting velvet pile -->
+    <path d="M14 22 L20 28 M22 18 L28 24 M30 16 L36 22 M40 18 L46 24 M48 22 L54 28
+             M12 32 L18 38 M22 30 L28 36 M32 28 L38 34 M42 30 L48 36 M50 34 L54 38
+             M16 44 L22 48 M26 42 L32 48 M36 42 L42 48 M46 44 L50 48"
+          stroke="#3a0808" stroke-width="0.6" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="32" cy="32" r="30" fill="url(#vlvSheen)"/>
+  <circle cx="32" cy="32" r="30" fill="none" stroke="#000" stroke-opacity="0.35" stroke-width="0.5"/>
+</svg>

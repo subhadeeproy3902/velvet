@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070707" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#fbfbfb" media="(prefers-color-scheme: light)" />
+
+    <!-- Theme bootstrap before paint to avoid FOUC -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem("velvet-theme");
+          var prefersLight =
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: light)").matches;
+          var t = stored || (prefersLight ? "light" : "dark");
+          document.documentElement.setAttribute("data-theme", t);
+        } catch (e) {}
+      })();
+    </script>
+
+    <!-- ── Primary ─────────────────────────────────────────── -->
+    <title>velvet-fx — WebGL velvet fabric shader for React</title>
+    <meta
+      name="description"
+      content="velvet-fx is a focused React component that paints a real-time WebGL velvet fabric shader onto any element. Four compositing variants (background, border, text, overlay), five drivers (auto, cursor, scroll, gyroscope, static), full fabric BRDF with fold ridges and fiber pile, theme-aware palettes, ~18 kB packed, zero runtime dependencies."
+    />
+    <link rel="canonical" href="https://velvet.mvp-subha.me/" />
+    <meta
+      name="keywords"
+      content="react, velvet, webgl, glsl, shader, brdf, fabric, silk, satin, suede, crushed, animation, react component, npm package, cursor, scroll, gyroscope, auto-animation, ui, motion design, typescript, hyperrealistic, fiber pile, drape, sheen"
+    />
+    <meta name="author" content="Subhadeep Roy" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <meta name="googlebot" content="index, follow" />
+
+    <!-- ── Google site verification ────────────────────────── -->
+    <meta name="google-site-verification" content="j17xTfsfQNFRsmJz5hk276G-Lzb0Guu2Dxlwu_6QuTw" />
+
+    <!-- ── Open Graph ──────────────────────────────────────── -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="velvet-fx" />
+    <meta property="og:title" content="velvet-fx — WebGL velvet fabric shader for React" />
+    <meta
+      property="og:description"
+      content="Real-time WebGL velvet fabric shader. Four variants, five drivers, silk/satin/suede/crushed presets, zero runtime dependencies."
+    />
+    <meta property="og:url" content="https://velvet.mvp-subha.me/" />
+    <meta property="og:image" content="https://velvet.mvp-subha.me/og.svg" />
+    <meta property="og:image:type" content="image/svg+xml" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="velvet-fx — animated WebGL velvet fabric shader for React" />
+    <meta property="og:locale" content="en_US" />
+
+    <!-- ── Twitter / X ────────────────────────────────────── -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@mvp_Subha" />
+    <meta name="twitter:creator" content="@mvp_Subha" />
+    <meta name="twitter:title" content="velvet-fx — WebGL velvet fabric shader for React" />
+    <meta
+      name="twitter:description"
+      content="Four variants, five drivers, silk/satin/suede/crushed presets, zero runtime dependencies."
+    />
+    <meta name="twitter:image" content="https://velvet.mvp-subha.me/og.svg" />
+    <meta name="twitter:image:alt" content="velvet-fx — animated WebGL velvet fabric shader for React" />
+
+    <!-- ── Icons / manifest ───────────────────────────────── -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="alternate" type="application/json+oembed" href="/oembed.json" />
+
+    <!-- ── AI / LLM discovery (llms.txt convention) ────────── -->
+    <link rel="alternate" type="text/markdown" href="/llms.txt" title="velvet-fx — LLM digest" />
+
+    <!-- ── Webfonts ───────────────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Prata&display=swap"
+    />
+
+    <!-- ── JSON-LD: SoftwareSourceCode (rich result for code packages) ── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareSourceCode",
+        "name": "velvet-fx",
+        "alternateName": "Velvet fx",
+        "description": "A focused React component that paints a real-time WebGL velvet fabric shader onto any element. Four compositing variants, five drivers, full fabric BRDF with fold ridges and fiber pile, theme-aware palettes, zero runtime dependencies.",
+        "url": "https://velvet.mvp-subha.me/",
+        "codeRepository": "https://github.com/subhadeeproy3902/velvet-fx",
+        "programmingLanguage": ["TypeScript", "React", "GLSL"],
+        "runtimePlatform": "React 18+",
+        "license": "https://opensource.org/licenses/MIT",
+        "softwareVersion": "1.0.0",
+        "operatingSystem": "Web",
+        "applicationCategory": "DeveloperApplication",
+        "author": {
+          "@type": "Person",
+          "name": "Subhadeep Roy",
+          "url": "https://x.com/mvp_Subha",
+          "sameAs": [
+            "https://github.com/subhadeeproy3902",
+            "https://x.com/mvp_Subha",
+            "https://www.linkedin.com/in/subhadeep3902"
+          ]
+        },
+        "keywords": "react, velvet, webgl, glsl, shader, brdf, fabric, silk, satin, suede, animation, npm",
+        "image": "https://velvet.mvp-subha.me/og.svg"
+      }
+    </script>
+
+    <!-- ── JSON-LD: FAQPage (Answer Engine Optimization) ──── -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is velvet-fx?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "velvet-fx is a React component that paints a real-time WebGL velvet fabric shader onto any element. Wrap any child element with <Velvet> and the shader renders draped, animated fabric — velvet, silk, satin, suede or crushed velvet — behind, around, inside, or over the children depending on which compositing variant you pick."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I install velvet-fx?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Run `bun add velvet-fx`, `npm install velvet-fx`, or `pnpm add velvet-fx`. It declares `react` and `react-dom` as peer dependencies and has zero runtime dependencies of its own."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What fabric types does velvet-fx render?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "One shader, five presets. Silk is low grain and high roughness (sharp specular highlights). Satin is mid grain, mid roughness. Velvet is high grain, medium roughness (matte pile). Suede is very high grain, very low roughness (deep matte). Crushed velvet is high depth (dramatic folds). All are tuned via four numeric props — grain, depth, roughness, intensity — so you can dial any fabric in between."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What are the compositing variants?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Four. `background` fills the element behind its children. `border` masks the canvas to a border ring so only the outline shimmers. `text` masks the canvas to the children's text glyph shape so the velvet only renders inside the letters. `overlay` floats the canvas on top of the children with `mix-blend-mode: overlay` and `pointer-events: none`, so velvet drapes over any existing content."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What drives the animation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Five drivers. `auto` (default) — the shader's noise field drifts linearly through u_time on its own, no input needed. `cursor` — pointer position pans the texture. `scroll` — element scroll progress pans the texture. `gyroscope` — device-orientation gamma/beta pans the texture on mobile. `static` — a fixed angle, no movement. All five feed the same `lightX`/`lightY` uniforms each frame."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does velvet-fx work with server-side rendering?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. SSR-safe. There is no `window`, `canvas`, or `document` access at module load. Styles inject once on the client via a singleton style tag. The canvas only mounts after hydration via `useState(false) + useEffect`, so the initial server render is a plain wrapper div with the children inside."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it cause React re-renders during the animation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. The RAF loop reads all animation state from refs and writes directly to WebGL uniforms — there are zero setState calls in the loop. Prop changes update mirror refs via dedicated useEffects but never re-bind the loop or re-mount the GL context."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which browsers are supported?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "WebGL 1.0 — Chrome / Edge 88+, Safari 14.1+, Firefox 63+. The shader uses `precision highp float`, unrollable for-loops with constant bounds, mat2/vec2/vec3 — all standard GLSL ES 1.00 features supported across evergreen browsers."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does it respect prefers-reduced-motion?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. When the user has `prefers-reduced-motion: reduce` set, the cursor smoothing lerp is short-circuited to an instant snap so transitions don't slide, while the shader's slow ambient drift remains (it's the entire visual identity of the effect)."
+            }
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

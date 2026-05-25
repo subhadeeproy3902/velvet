@@ -1,0 +1,10 @@
+node_modules
+dist
+dist-demo
+*.tsbuildinfo
+.DS_Store
+*.log
+.vite
+.cache
+demo/node_modules
+.claude

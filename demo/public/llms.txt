@@ -1,0 +1,76 @@
+# velvet-fx
+
+> A focused React component that paints a real-time WebGL velvet fabric shader onto any element. One shader renders silk, satin, velvet, suede or crushed velvet via four numeric props. Four compositing variants (background, border, text, overlay), five drivers (auto, cursor, scroll, gyroscope, static), zero runtime dependencies.
+
+## Install
+
+```bash
+bun add velvet-fx
+# or: npm install velvet-fx
+# or: pnpm add velvet-fx
+```
+
+## Quick start
+
+```tsx
+import { Velvet } from 'velvet-fx'
+
+<Velvet
+  variant="background"
+  color="#8B0000"
+  driver="auto"
+  style={{ borderRadius: 18 }}
+>
+  <Card />
+</Velvet>
+```
+
+## API
+
+`<Velvet>` is the only export. All animation state lives in refs — no setState in the RAF loop, no re-renders during animation. SSR-safe.
+
+### Props
+
+- `color: string` (default `#8B0000`) — base fabric color
+- `sheen: string` (default = lightened color) — specular highlight color
+- `variant: 'background' | 'border' | 'text' | 'overlay'` (default `background`)
+- `driver: 'auto' | 'cursor' | 'scroll' | 'gyroscope' | 'static'` (default `auto`)
+- `grain: number` 0–1 (default 0.6) — fiber density (silk low, velvet/suede high)
+- `depth: number` 0–1 (default 0.4) — fold depth / crushed-ness
+- `roughness: number` 1–10 (default 4) — sheen tightness (silk high, suede low)
+- `intensity: number` 0–1 (default 0.8) — overall highlight strength
+- `speed: number` (default 1) — texture drift rate
+- `angle: number` 0–360 (default 45) — static driver light angle
+- `ease: number` 0.01–1 (default 0.08) — cursor smoothing lerp
+- `trackWindow: boolean` (default false) — cursor across whole viewport
+- `borderWidth: number` (default 2), `borderRadius: number` (default 12) — for `variant="border"`
+- `paused: boolean` (default false) — freeze on current frame
+- `onSheenChange: (x, y, intensity) => void` — per-frame callback; use refs, never setState
+- All standard `HTMLDivElement` props forwarded; `ref` resolves to the wrapper
+
+### Fabric presets
+
+- **Silk** — `grain≈0.18, roughness≈9.5` (smooth + sharp specular)
+- **Satin** — `grain≈0.32, roughness≈8.0` (slight grain + crisp sheen)
+- **Velvet** — `grain≈0.70, roughness≈4.0` (full pile + matte sheen)
+- **Suede** — `grain≈0.92, roughness≈2.2` (heavy fuzz + flat matte)
+- **Crushed** — `depth≈0.92` (dramatic folds, any grain)
+
+## How it works
+
+- Fragment shader uses 5-octave fBm noise with a rotation matrix between octaves for organic fiber grain.
+- Two anisotropic noise fields are sharpened into directional fold ridges via `ridge(v) = 1 - |v - 0.5| * 2` and powered by `pow(., 1.2 + depth * 2.4)` for sharp peaks and deep valleys.
+- Linear monotonic `u_time` drift (not sin/cos) gives true continuous flow — sampling at ever-increasing noise coordinates over the infinite noise field.
+- Specular sheen is mask-gated to the brightest ridge peaks via `smoothstep(0.55, 0.92, …)` and capped at 0.55 mix so the base color always survives in highlights.
+- For `variant="text"`, the text mask is drawn into an offscreen 2D canvas (not an SVG data URL, which can't access document `@font-face` webfonts) and applied as `mask-image` on the WebGL canvas.
+
+## Links
+
+- Demo: https://velvet.mvp-subha.me
+- GitHub: https://github.com/subhadeeproy3902/velvet-fx
+- npm: https://www.npmjs.com/package/velvet-fx
+- Author: https://x.com/mvp_Subha
+
+## License
+
+MIT — Subhadeep Roy

@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "type": "link",
+  "title": "velvet-fx — WebGL velvet fabric shader for React",
+  "author_name": "Subhadeep Roy",
+  "author_url": "https://x.com/mvp_Subha",
+  "provider_name": "velvet-fx",
+  "provider_url": "https://velvet.mvp-subha.me",
+  "thumbnail_url": "https://velvet.mvp-subha.me/og.svg",
+  "thumbnail_width": 1200,
+  "thumbnail_height": 630
+}

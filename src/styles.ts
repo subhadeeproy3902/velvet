@@ -1,0 +1,65 @@
+const STYLE_TAG_ATTR = 'data-velvet-fx'
+
+export function injectStyles(): void {
+  if (typeof document === 'undefined') return
+  if (document.querySelector(`[${STYLE_TAG_ATTR}]`)) return
+
+  const style = document.createElement('style')
+  style.setAttribute(STYLE_TAG_ATTR, '')
+  style.textContent = buildCSS()
+  document.head.appendChild(style)
+}
+
+function buildCSS(): string {
+  return `
+.velvet-root {
+  position: relative;
+  display: inline-flex;
+  isolation: isolate;
+}
+
+.velvet-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.velvet-children {
+  position: relative;
+  width: 100%;
+  z-index: 2;
+}
+
+.velvet-variant-background .velvet-canvas { z-index: 0; }
+.velvet-variant-background .velvet-children { z-index: 2; }
+
+.velvet-variant-border .velvet-canvas { z-index: 0; }
+.velvet-variant-border .velvet-children { z-index: 2; }
+
+/* Text variant — canvas is masked to the text glyphs in Velvet.tsx,
+ * so velvet only renders inside the letters. Children stay in the
+ * tree for layout sizing, hidden via plain visibility so the DOM text
+ * never paints. */
+.velvet-variant-text .velvet-canvas { z-index: 1; }
+.velvet-variant-text .velvet-children {
+  z-index: 0;
+  visibility: hidden;
+}
+
+.velvet-variant-overlay .velvet-children { z-index: 1; }
+.velvet-variant-overlay .velvet-canvas {
+  z-index: 2;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .velvet-canvas { transition: none !important; }
+}
+`
+}

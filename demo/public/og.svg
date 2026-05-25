@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0303"/>
+      <stop offset="0.55" stop-color="#1a0606"/>
+      <stop offset="1" stop-color="#050202"/>
+    </linearGradient>
+    <radialGradient id="velvetWash" cx="0.35" cy="0.55" r="0.7">
+      <stop offset="0" stop-color="#7a0e1c" stop-opacity="0.85"/>
+      <stop offset="0.5" stop-color="#3a0808" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#0a0303" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="sheen" cx="0.62" cy="0.34" r="0.42">
+      <stop offset="0" stop-color="#ffd4d4" stop-opacity="0.42"/>
+      <stop offset="0.6" stop-color="#ff8a8a" stop-opacity="0.1"/>
+      <stop offset="1" stop-color="#ff5a78" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="badgeFill" cx="0.35" cy="0.35" r="0.85">
+      <stop offset="0" stop-color="#ffb4b4" stop-opacity="0.95"/>
+      <stop offset="0.45" stop-color="#7a0e1c"/>
+      <stop offset="1" stop-color="#2a0606"/>
+    </radialGradient>
+    <linearGradient id="hairline" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#ff5a78" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#ff5a78" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#ff5a78" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="fiber" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
+      <rect width="1" height="1" fill="#ffd4d4" fill-opacity="0.04"/>
+    </pattern>
+  </defs>
+
+  <!-- Base -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#velvetWash)"/>
+  <rect width="1200" height="630" fill="url(#sheen)"/>
+  <rect width="1200" height="630" fill="url(#fiber)"/>
+
+  <!-- Fold ridges (subtle velvet drape suggestion) -->
+  <g stroke="#ff8a8a" stroke-width="1" fill="none" opacity="0.18">
+    <path d="M -50 540 Q 200 510, 450 525 T 900 520 T 1300 540"/>
+    <path d="M -50 580 Q 200 560, 450 570 T 900 565 T 1300 585"/>
+    <path d="M -50 480 Q 200 440, 450 470 T 900 460 T 1300 480"/>
+  </g>
+
+  <!-- Logo badge -->
+  <g transform="translate(96, 130)">
+    <circle cx="36" cy="36" r="36" fill="url(#badgeFill)"/>
+    <circle cx="36" cy="36" r="36" fill="none" stroke="#ff5a78" stroke-width="0.6" opacity="0.6"/>
+  </g>
+
+  <!-- Title -->
+  <text x="192" y="172"
+        font-family="'Prata', Georgia, serif"
+        font-size="76" font-weight="400"
+        fill="#fbfbfb" letter-spacing="-3">velvet-fx</text>
+
+  <!-- Tagline -->
+  <text x="96" y="312"
+        font-family="'Prata', Georgia, serif"
+        font-size="64" font-weight="400"
+        fill="#fbfbfb" letter-spacing="-2">WebGL velvet</text>
+  <text x="96" y="380"
+        font-family="'Prata', Georgia, serif"
+        font-size="64" font-weight="400"
+        fill="#fbfbfb" letter-spacing="-2">fabric shader for React</text>
+
+  <!-- Hairline divider -->
+  <rect x="96" y="430" width="600" height="1" fill="url(#hairline)"/>
+
+  <!-- Feature row -->
+  <g font-family="'Manrope', -apple-system, sans-serif"
+     font-size="18" font-weight="500" letter-spacing="2"
+     fill="#fbfbfb" fill-opacity="0.78">
+    <text x="96"  y="468">FOUR&#160;VARIANTS</text>
+    <text x="338" y="468">FIVE&#160;DRIVERS</text>
+    <text x="544" y="468">ZERO&#160;DEPS</text>
+  </g>
+
+  <!-- Footer -->
+  <g font-family="ui-monospace, 'SFMono-Regular', Menlo, monospace" font-size="20">
+    <text x="96" y="568" fill="#fbfbfb" fill-opacity="0.55" letter-spacing="2">velvet.mvp-subha.me</text>
+    <text x="1104" y="568" fill="#fbfbfb" fill-opacity="0.55" text-anchor="end">$ bun add velvet-fx</text>
+  </g>
+</svg>

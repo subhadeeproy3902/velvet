@@ -1,0 +1,10 @@
+demo/
+src/
+public/
+*.config.ts
+tsconfig*.json
+.github/
+node_modules/
+dist-demo/
+prompt.md
+CLAUDE.md

@@ -1,0 +1,26 @@
+User-agent: *
+Allow: /
+
+# AI / LLM crawlers — opt-in for documentation discovery
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+Sitemap: https://velvet.mvp-subha.me/sitemap.xml
