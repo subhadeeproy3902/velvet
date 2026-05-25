@@ -8,3 +8,4 @@ dist-demo
 .cache
 demo/node_modules
 .claude
+scripts/

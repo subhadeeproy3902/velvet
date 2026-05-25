@@ -71,8 +71,14 @@ class VelvetSharedRenderer {
 
   private constructor() {
     this.glCanvas = document.createElement('canvas')
-    this.glCanvas.width = 64
-    this.glCanvas.height = 64
+    // Pre-allocate the shared canvas large enough for the biggest
+    // realistic Velvet on the page. Per-target resizing inside the
+    // render loop was wiping content between targets (each canvas.width
+    // assignment recreates the WebGL drawing buffer and clobbers the
+    // pending pixels of the target that just drew), leaving the early
+    // targets blank. Static size = no surprise wipes.
+    this.glCanvas.width = 2048
+    this.glCanvas.height = 1024
     this.glCanvas.setAttribute('aria-hidden', 'true')
     this.glCanvas.setAttribute('data-velvet-fx-renderer', '')
     const s = this.glCanvas.style
@@ -279,13 +285,23 @@ class VelvetSharedRenderer {
     const w = Math.max(1, Math.round(cw * t.dpr))
     const h = Math.max(1, Math.round(ch * t.dpr))
 
-    if (this.glCanvas.width < w) this.glCanvas.width = w
-    if (this.glCanvas.height < h) this.glCanvas.height = h
+    // Shared canvas is pre-allocated large enough — but if a target
+    // somehow exceeds the pre-allocation, grow ONCE and keep going.
+    // Avoid the per-frame width/height churn that breaks early targets.
+    const needW = Math.max(this.glCanvas.width, w)
+    const needH = Math.max(this.glCanvas.height, h)
+    if (needW > this.glCanvas.width) this.glCanvas.width = needW
+    if (needH > this.glCanvas.height) this.glCanvas.height = needH
 
     if (t.canvas.width !== w) t.canvas.width = w
     if (t.canvas.height !== h) t.canvas.height = h
 
-    gl.viewport(0, 0, w, h)
+    // gl.viewport uses WebGL window coords (y up, origin bottom-left).
+    // drawImage reads using canvas image coords (y down, origin top-left).
+    // Placing the viewport at the TOP of the framebuffer in window-coords
+    // (== top of image after the y-flip the browser does when reading)
+    // is what makes the bottom drawImage source rect line up.
+    gl.viewport(0, this.glCanvas.height - h, w, h)
     gl.clearColor(0, 0, 0, 0)
     gl.clear(gl.COLOR_BUFFER_BIT)
 

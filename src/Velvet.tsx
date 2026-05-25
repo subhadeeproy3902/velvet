@@ -273,7 +273,27 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
         if (!ctx) return
         ctx.scale(dpr, dpr)
         ctx.clearRect(0, 0, w, h)
+
+        // canvas2D font shorthand parser is stricter than CSS — if the
+        // assignment "doesn't take" it silently retains the previous
+        // value (default "10px sans-serif"), and the masked text ends
+        // up minuscule. Try the spec-canonical shorthand first; if
+        // ctx.font ends up reflecting the default, fall back to a
+        // simpler form that strips alternate families.
         ctx.font = fontShorthand
+        if (ctx.font === '10px sans-serif' && fontSize !== '10px') {
+          const firstFamily = fontFamily
+            .split(',')[0]
+            .trim()
+            .replace(/^['"]|['"]$/g, '')
+          ctx.font = `${fontWeight} ${fontSize} ${firstFamily}, sans-serif`
+          // If even that fails, drop the weight too — some parsers choke
+          // on numeric weights with quoted families.
+          if (ctx.font === '10px sans-serif') {
+            ctx.font = `${fontSize} ${firstFamily}, sans-serif`
+          }
+        }
+
         ctx.fillStyle = '#fff'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
@@ -294,18 +314,26 @@ export const Velvet = forwardRef<HTMLDivElement, VelvetProps>(
       }
 
       // Draw once immediately so the velvet appears at hydration time,
-      // then redraw once the webfont is actually loaded so the glyph
-      // shapes are correct.
+      // then redraw on three signals so we catch every late-binding
+      // scenario: the targeted .load(), all-fonts-ready, and one
+      // RAF-tick delay (the SAFEST signal that the font metrics are
+      // queryable in canvas2D after the document's @font-face fetched).
       draw()
       if (
         typeof document !== 'undefined' &&
         'fonts' in document &&
         document.fonts
       ) {
-        document.fonts
-          .load(fontShorthand, text)
-          .then(draw)
-          .catch(() => {})
+        document.fonts.load(fontShorthand, text).then(draw).catch(() => {})
+        if (document.fonts.ready) {
+          document.fonts.ready.then(() => {
+            draw()
+            // One more RAF later — some browsers report fonts.ready
+            // resolved before canvas2D's internal font metric cache
+            // has refreshed.
+            requestAnimationFrame(draw)
+          }).catch(() => {})
+        }
       }
     }, [clearMask])
 
