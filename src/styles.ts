@@ -49,6 +49,12 @@ function buildCSS(): string {
 .velvet-variant-text .velvet-children {
   z-index: 0;
   visibility: hidden;
+  /* In the inline-flex .velvet-root, the child's width:100% creates a
+   * circular size: parent sizes to child, child takes 100% of parent.
+   * width:auto makes the child size to its content (the text), which
+   * the inline-flex wrapper then resolves against — so the canvas
+   * actually has the text-bounds dimensions instead of collapsing. */
+  width: auto;
 }
 
 .velvet-variant-overlay .velvet-children { z-index: 1; }
